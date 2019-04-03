@@ -1,24 +1,7 @@
-/* Copyright (C) 2012 Kristian Lauszus, TKJ Electronics. All rights reserved.
-
- This software may be distributed and modified under the terms of the GNU
- General Public License version 2 (GPL2) as published by the Free Software
- Foundation and appearing in the file GPL2.TXT included in the packaging of
- this file. Please note that GPL2 Section 2[b] requires that all works based
- on this software must also be made publicly available under the terms of
- the GPL2 ("Copyleft").
-
- Contact information
- -------------------
-
- Kristian Lauszus, TKJ Electronics
- Web      :  http://www.tkjelectronics.com
- e-mail   :  kristianl@tkjelectronics.com
- */
-
 #include <Wire.h>
-#include <Kalman.h> // Source: https://github.com/TKJElectronics/KalmanFilter
+#include <Kalman.h>
 
-#define RESTRICT_PITCH // Comment out to restrict roll to ±90deg instead - please read: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf
+#define RESTRICT_PITCH
 
 Kalman kalmanX; // Create the Kalman instances
 Kalman kalmanY;
@@ -34,8 +17,6 @@ double kalAngleX, kalAngleY; // Calculated angle using a Kalman filter
 
 uint32_t timer;
 uint8_t i2cData[14]; // Buffer for I2C data
-
-// TODO: Make calibration routine
 
 void setup() {
   Serial.begin(115200);
@@ -67,8 +48,6 @@ void setup() {
   accY = (int16_t)((i2cData[2] << 8) | i2cData[3]);
   accZ = (int16_t)((i2cData[4] << 8) | i2cData[5]);
 
-  // Source: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf eq. 25 and eq. 26
-  // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
   // It is then converted from radians to degrees
 #ifdef RESTRICT_PITCH // Eq. 25 and 26
   double roll  = atan2(accY, accZ) * RAD_TO_DEG;
@@ -102,8 +81,6 @@ void loop() {
   double dt = (double)(micros() - timer) / 1000000; // Calculate delta time
   timer = micros();
 
-  // Source: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf eq. 25 and eq. 26
-  // atan2 outputs the value of -π to π (radians) - see http://en.wikipedia.org/wiki/Atan2
   // It is then converted from radians to degrees
 #ifdef RESTRICT_PITCH // Eq. 25 and 26
   double roll  = atan2(accY, accZ) * RAD_TO_DEG;
